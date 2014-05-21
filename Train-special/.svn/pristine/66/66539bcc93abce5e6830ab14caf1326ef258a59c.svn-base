@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>2A58F07A-244D-475E-B7D1-5F9990233F96</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Train-special</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>39D48D76-C141-4A77-A1D4-B02629BA9759</key>
+		<string>https://github.com/techistoner/TRAIN.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Train-special/Train-special.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>39D48D76-C141-4A77-A1D4-B02629BA9759</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/techistoner/TRAIN.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>39D48D76-C141-4A77-A1D4-B02629BA9759</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>39D48D76-C141-4A77-A1D4-B02629BA9759</string>
+			<key>IDESourceControlWCCName</key>
+			<string>TRAIN</string>
+		</dict>
+	</array>
+</dict>
+</plist>

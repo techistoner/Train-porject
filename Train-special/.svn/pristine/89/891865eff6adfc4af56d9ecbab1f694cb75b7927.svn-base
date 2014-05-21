@@ -1,0 +1,239 @@
+//
+//  DEMOHomeViewController.m
+//  REFrostedViewControllerExample
+//
+//  Created by Roman Efimov on 9/18/13.
+//  Copyright (c) 2013 Roman Efimov. All rights reserved.
+//
+
+#import "DEMOHomeViewController.h"
+#import "DEMONavigationController.h"
+#import "MBProgressHUD.h"
+#import "TrianTimeViewController.h"
+#import "StSViewController.h"
+#import "SelectViewController.h"
+#import "TSLocateView.h"
+@interface DEMOHomeViewController ()
+
+@end
+
+@implementation DEMOHomeViewController
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	self.title = @"火车查询";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"菜单"
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:(DEMONavigationController *)self.navigationController
+                                                                            action:@selector(showMenu)];
+    
+    
+    
+    
+    //车次查询界面
+    [self.TrianName setHidden:NO];
+    [self.TrainQueryBtn setHidden:NO];
+    [self.TrainQueryBtn setTag:0];
+    [self.chooseTrain setHidden:NO];
+    [self.chooseTrain setTag:0];
+    [self.chooseStart setTag:1];
+    [self.chooseEnd setTag:2];
+    [self.chooseTrain addTarget:self action:@selector(gotoSelecView:) forControlEvents:UIControlEventTouchUpInside];
+    [self.chooseStart addTarget:self action:@selector(gotoSelecView:) forControlEvents:UIControlEventTouchUpInside];
+    [self.chooseEnd addTarget:self action:@selector(gotoSelecView:) forControlEvents:UIControlEventTouchUpInside];
+    //站站查询
+    [self.chooseStart setHidden:YES];
+    [self.chooseEnd setHidden:YES];
+    [self.StationQueryBtn setHidden:YES];
+    [self.StationQueryBtn setTag:1];
+    [self.OriginPalce setHidden:YES];
+    [self.Destination setHidden:YES];
+    [self.ChangBtn setHidden:YES];
+    [self.ChangBtn addTarget:self action:@selector(changOringlandDest:) forControlEvents:UIControlEventTouchUpInside];
+    [self.TrainBtn setTag:0];
+    [self.StationBtn setTag:1];
+    [self.TrainBtn addTarget:self action:@selector(changView:) forControlEvents:UIControlEventTouchUpInside];
+    [self.StationBtn addTarget:self action:@selector(changView:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    
+    [self.TrainQueryBtn addTarget:self action:@selector(QueryFunction:) forControlEvents:UIControlEventTouchUpInside];
+    [self.StationQueryBtn addTarget:self action:@selector(QueryFunction:) forControlEvents:UIControlEventTouchUpInside];
+    self.hud = [[MBProgressHUD alloc]initWithView:self.view];
+    self.hud.labelText = @"正在查询";
+    self.hud.dimBackground = NO;
+    
+}
+-(IBAction)hideKB:(id)sender
+{
+    [self.TrianName resignFirstResponder];
+    [self.OriginPalce resignFirstResponder];
+    [self.Destination resignFirstResponder];
+}
+
+-(void)changOringlandDest:(id)sender
+{
+    NSString *temp = nil;
+    temp = self.OriginPalce.text;
+    [self.OriginPalce setText:self.Destination.text];
+    [self.Destination setText:temp];
+    
+}
+
+-(void)changView :(UIButton *)sender
+{
+    if (sender.tag==0) {
+        [self.StationQueryBtn setHidden:YES];
+        [self.OriginPalce setHidden:YES];
+        [self.Destination setHidden:YES];
+        [self.ChangBtn setHidden:YES];
+        [self.chooseStart setHidden:YES];
+        [self.chooseEnd setHidden:YES];
+        [self.chooseTrain setHidden:NO];
+        [self.TrianName setHidden:NO];
+        [self.TrainQueryBtn setHidden:NO];
+    }
+    else
+    {
+        [self.StationQueryBtn setHidden:NO];
+        [self.OriginPalce setHidden:NO];
+        [self.Destination setHidden:NO];
+        [self.ChangBtn setHidden:NO];
+        [self.chooseStart setHidden:NO];
+        [self.chooseEnd setHidden:NO];
+        [self.chooseTrain setHidden:YES];
+        
+        [self.TrianName setHidden:YES];
+        [self.TrainQueryBtn setHidden:YES];
+    }
+}
+
+-(void)gotoSelecView :(UIButton *)sender
+{
+//    SelectViewController *selectVC = [[SelectViewController alloc]initWithNibName:@"SelectViewController" bundle:nil];
+//    [self.navigationController pushViewController:selectVC animated:YES];
+    TSLocateView *locateView = [[TSLocateView alloc] initWithTitle:@"定位城市" delegate:self];
+    [locateView showInView:self.view];
+    
+    
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    TSLocateView *locateView = (TSLocateView *)actionSheet;
+    TSLocation *location = locateView.locate;
+    NSLog(@"city:%@ lat:%f lon:%f", location.city, location.latitude, location.longitude);
+    //You can uses location to your application.
+    if(buttonIndex == 0) {
+        NSLog(@"Cancel");
+    }else {
+        NSLog(@"Select");
+    }
+}
+
+-(void)QueryFunction:(UIButton *)sender
+{
+    
+    [self hideKB:nil];
+    
+    
+    if (sender.tag==0) {
+        
+        if (self.TrianName.text.length==0) {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"输入不能为空" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+        else
+        {
+            
+            NSString *url = [NSString stringWithFormat:@"http://apis.juhe.cn/train/s?name=%@&key=%@",[self.TrianName.text stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],APPKEY];
+            ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+            [request setRequestMethod:@"GET"];
+            [request setDelegate:self];
+            [request setTag:0];
+            [request startAsynchronous];
+        }
+    }
+    else
+    {
+        if (self.OriginPalce.text.length==0||self.Destination.text.length==0) {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"输入不能为空" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+        else
+        {
+            NSString *url = [NSString stringWithFormat:@"http://apis.juhe.cn/train/s2s?start=%@&end=%@&key=%@",[self.OriginPalce.text stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],[self.Destination.text stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],APPKEY];
+            ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+            [request setRequestMethod:@"GET"];
+            [request setDelegate:self];
+            [request setTag:1];
+            [request startAsynchronous];
+        }
+    }
+    
+    
+}
+
+
+- (void)requestStarted:(ASIHTTPRequest *)request
+{
+    
+    [self.view addSubview:self.hud];
+    [self.hud show:YES];
+    NSLog(@"******");
+    
+}
+
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+    [self.hud removeFromSuperview];
+    [self.hud show:NO];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[request responseData] options:NSJSONReadingMutableLeaves error:nil];
+    NSString *stataCode = [dic objectForKey:@"resultcode"];
+    switch ([stataCode intValue]) {
+        case 200:
+        {
+            if (request.tag==0) {
+                TrianTimeViewController *train = [[TrianTimeViewController alloc]initWithNibName:@"TrianTimeViewController" bundle:nil];
+                train.dictonary = dic;
+                [self.navigationController pushViewController:train animated:YES];
+            }
+            else if (request.tag==1)
+            {
+                NSLog(@"******%@",dic);
+                StSViewController *stsVC = [[StSViewController alloc]initWithNibName:@"StSViewController" bundle:nil];
+                stsVC.stsDic = dic;
+                stsVC.startString = self.OriginPalce.text;
+                stsVC.endString = self.Destination.text;
+                [self.navigationController pushViewController:stsVC animated:YES];
+            }
+        }
+            
+            break;
+        case 201:
+        {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"列次名称不能为空" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+            break;
+        case 202:
+        {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"查询不到结果" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"网络错误，请检查您的网络" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+    [alert show];
+}
+
+
+@end

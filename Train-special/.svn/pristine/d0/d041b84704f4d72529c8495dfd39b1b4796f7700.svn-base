@@ -1,0 +1,159 @@
+//
+//  StSViewController.m
+//  Train-special
+//
+//  Created by GST_MAC02 on 14-1-16.
+//  Copyright (c) 2014年 GST_MAC02. All rights reserved.
+//
+
+#import "StSViewController.h"
+#import "StationCell.h"
+#import "TrianTimeViewController.h"
+@interface StSViewController ()
+{
+    NSArray *stationArray;
+}
+
+@end
+
+@implementation StSViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    NSDictionary *dic = [self.stsDic objectForKey:@"result"];
+    [self.total setText:[NSString stringWithFormat:@"共%@条线路",[dic objectForKey:@"totalcount"]]];
+    [self.start setText:self.startString];
+    [self.end setText:self.endString];
+    stationArray = [dic objectForKey:@"data"];
+
+    self.table = [[UITableView alloc]initWithFrame:CGRectMake(0, 125, 320, [[UIScreen mainScreen] applicationFrame].size.height-125) style:UITableViewStylePlain];
+    [self.table setDelegate:self];
+    [self.table setDataSource:self];
+    [self.view addSubview:self.table];
+    
+    self.hud = [[MBProgressHUD alloc]initWithView:self.view];
+    self.hud.labelText = @"正在查询";
+    self.hud.dimBackground = NO;
+}
+- (void)viewWillAppear:(BOOL)animated
+
+{
+    
+    [super viewWillAppear:animated];
+    
+    [self.table deselectRowAtIndexPath:self.table.indexPathForSelectedRow animated:YES];
+    
+    
+    
+}
+
+#pragma mark tableview
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 75;
+}
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [stationArray count];
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *SimpleTableIdentifier = @"StationCell";
+    StationCell *cell = [tableView dequeueReusableCellWithIdentifier:
+                  SimpleTableIdentifier];
+    if (cell == nil)
+    {
+        NSArray *nib = [[NSBundle mainBundle]loadNibNamed:@"StationCell" owner:self options:nil];
+        cell = nib[0];
+    }
+    NSDictionary *dic = [stationArray objectAtIndex:indexPath.row];
+    [cell.trainOpp setText:[NSString stringWithFormat:@"%@(%@)",[dic objectForKey:@"trainOpp"],[dic objectForKey:@"train_typename"]]];
+    [cell.arrived_time setText:[NSString stringWithFormat:@"%@",[dic objectForKey:@"arrived_time"]]];
+
+    [cell.leave_time setText:[NSString stringWithFormat:@"%@",[dic objectForKey:@"leave_time"]]];
+    [cell.mileage setText:[NSString stringWithFormat:@"%@",[dic objectForKey:@"mileage"]]];
+    [cell.start_staion setText:[NSString stringWithFormat:@"%@",[dic objectForKey:@"start_staion"]]];
+       [cell.end_station setText:[NSString stringWithFormat:@"%@",[dic objectForKey:@"end_station"]]];
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary *dic = [stationArray objectAtIndex:indexPath.row];
+    NSString *string = [NSString stringWithFormat:@"%@",[dic objectForKey:@"trainOpp"]];
+    NSString *url = [NSString stringWithFormat:@"http://apis.juhe.cn/train/s?name=%@&key=%@",[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],APPKEY];
+    ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+    [request setRequestMethod:@"GET"];
+    [request setDelegate:self];
+    [request startAsynchronous];
+
+    
+    
+}
+- (void)requestStarted:(ASIHTTPRequest *)request
+{
+    
+    [self.view addSubview:self.hud];
+    [self.hud show:YES];
+    NSLog(@"******");
+    
+}
+- (void)requestFinished:(ASIHTTPRequest *)request
+{
+    [self.hud removeFromSuperview];
+    [self.hud show:NO];
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:[request responseData] options:NSJSONReadingMutableLeaves error:nil];
+    NSString *stataCode = [dic objectForKey:@"resultcode"];
+    switch ([stataCode intValue]) {
+        case 200:
+        {
+                TrianTimeViewController *train = [[TrianTimeViewController alloc]initWithNibName:@"TrianTimeViewController" bundle:nil];
+                train.dictonary = dic;
+                [self.navigationController pushViewController:train animated:YES];
+        }
+            
+            break;
+        case 201:
+        {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"列次名称不能为空" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+            break;
+        case 202:
+        {
+            UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"查询不到结果" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+        }
+            break;
+            
+        default:
+            break;
+    }
+
+}
+- (void)requestFailed:(ASIHTTPRequest *)request
+{
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"温馨提示" message:@"网络错误，请检查您的网络" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+    [alert show];
+  
+}
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+@end
