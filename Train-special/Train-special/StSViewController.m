@@ -250,6 +250,7 @@
     [cell.buy setTag:indexPath.row];
     [cell.buy addTarget:self action:@selector(buyticker:) forControlEvents:UIControlEventTouchUpInside];
     return cell;
+    //ceshi
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
