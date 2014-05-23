@@ -283,7 +283,7 @@
         trainArray = secondaryList;
     }
     
-    NSLog(@"trainArray = %@",trainArray);
+//    NSLog(@"trainArray = %@",trainArray);
     [self.pickView reloadComponent:0];
     [self.pickView reloadComponent:1];
      [self showInView:self.view];
@@ -472,7 +472,7 @@
 {
     [self.view addSubview:self.hud];
     [self.hud show:YES];
-    NSLog(@"******");
+//    NSLog(@"******");
     
 }
 

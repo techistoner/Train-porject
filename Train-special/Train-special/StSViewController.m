@@ -164,6 +164,8 @@
             [alert show];
             [del.stationCollection addObject:string];
             [[NSUserDefaults standardUserDefaults]setObject:del.stationCollection forKey:@"s"];
+            [rightbutton setBackgroundImage:[UIImage imageNamed:@"collected.png"]forState:UIControlStateNormal];
+
         }
     }
     

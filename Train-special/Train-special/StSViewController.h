@@ -20,6 +20,7 @@
 @property (strong , nonatomic) NSString *endString;
 @property (strong , nonatomic) NSString *typeString;
 
+
 @property (strong, nonatomic) UITableView *table;
 @property (strong, nonatomic) MBProgressHUD *hud;
 @property (strong, nonatomic) IBOutlet UIView *chooseView;

@@ -140,6 +140,8 @@
                 [alert show];
                 [del.trainCollection addObject:string];
                 [[NSUserDefaults standardUserDefaults]setObject:del.trainCollection forKey:@"t"];
+                [rightbutton setBackgroundImage:[UIImage imageNamed:@"collected.png"]forState:UIControlStateNormal];
+
             }
         }
     
